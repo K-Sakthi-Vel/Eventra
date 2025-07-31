@@ -1,7 +1,7 @@
-// app/page.tsx
 'use client';
 
 import { useState } from 'react';
+import { SignOutButton, UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import EventFilter from './components/EventFilter';
 import EventList from './components/EventList';
 
@@ -23,7 +23,19 @@ export default function HomePage() {
 
   return (
     <main className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Tier-Based Event Showcase</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Tier-Based Event Showcase</h1>
+        <div className="flex items-center gap-4">
+          <SignedOut>
+            <SignInButton mode="modal" />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+            <SignOutButton  />
+          </SignedIn>
+        </div>
+      </div>
+
       <EventFilter selectedTier={selectedTier} onSelect={setSelectedTier} />
       <EventList events={filteredEvents} />
     </main>
