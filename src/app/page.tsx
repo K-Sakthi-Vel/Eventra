@@ -1,7 +1,7 @@
 'use client';
 
+import { useUser, SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
 import { useState } from 'react';
-import { SignOutButton, UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import EventFilter from './components/EventFilter';
 import EventList from './components/EventList';
 
@@ -15,6 +15,7 @@ const allEvents = [
 
 export default function HomePage() {
   const [selectedTier, setSelectedTier] = useState<'Free' | 'Silver' | 'Gold' | 'Platinum'>('Free');
+  const { user, isLoaded } = useUser(); // 👈 Clerk user hook
 
   const filteredEvents = allEvents.filter((event) =>
     ['Free', 'Silver', 'Gold', 'Platinum'].indexOf(event.tier) <=
@@ -31,10 +32,19 @@ export default function HomePage() {
           </SignedOut>
           <SignedIn>
             <UserButton />
-            <SignOutButton  />
+            <SignOutButton />
           </SignedIn>
         </div>
       </div>
+
+      {/* Show user metadata if signed in and loaded */}
+      {isLoaded && user? (
+        <div className="mb-4 p-4 bg-black-100 rounded-md">
+          <h2 className="text-xl font-semibold mb-2">User Metadata</h2>
+          <p><strong>Username:</strong> {JSON.parse(JSON.stringify(user.publicMetadata)).username || 'N/A'}</p>
+          <p><strong>User Tier:</strong> {JSON.parse(JSON.stringify(user.publicMetadata)).tier || 'N/A'}</p>
+        </div>
+      ):"Loading"}
 
       <EventFilter selectedTier={selectedTier} onSelect={setSelectedTier} />
       <EventList events={filteredEvents} />

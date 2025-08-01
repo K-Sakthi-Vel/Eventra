@@ -21,7 +21,7 @@ export default function SignInPage() {
             <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
               Welcome Back
             </h1>
-            <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up"  fallbackRedirectUrl ="/home" />
+            <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up"  fallbackRedirectUrl ="/" />
           </div>
         </main>
       </div>
