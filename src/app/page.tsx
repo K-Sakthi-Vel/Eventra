@@ -29,17 +29,15 @@ export default function HomePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Set user tier from metadata
   useEffect(() => {
     if (isLoaded && user?.publicMetadata?.tier) {
       const tier = (user.publicMetadata.tier as string).toLowerCase();
       if (['free', 'silver', 'gold', 'platinum'].includes(tier)) {
-        setSelectedTier(tier.charAt(0).toUpperCase() + tier.slice(1) as Tier);
+        setSelectedTier(tier as Tier);
       }
     }
   }, [isLoaded, user]);
 
-  // Fetch events from Supabase
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
@@ -61,20 +59,19 @@ export default function HomePage() {
 
   const tierOrder = ['free', 'silver', 'gold', 'platinum'];
 
-  const filteredEvents = events.filter((event) => {
-    return (
+  const filteredEvents = events.filter(
+    (event) =>
       tierOrder.indexOf(event.tier.toLowerCase()) <=
       tierOrder.indexOf(selectedTier.toLowerCase())
-    );
-  });
-
-  console.log("filer", filteredEvents)
+  );
 
   return (
-    <main className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Tier-Based Event Showcase</h1>
-        <div className="flex items-center gap-4">
+    <main className="min-h-screen bg-black text-white px-4 py-6 md:px-10">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
+          Tier-Based Event Showcase
+        </h1>
+        <div className="flex items-center gap-3 mt-4 md:mt-0">
           <SignedOut>
             <SignInButton mode="modal" />
           </SignedOut>
@@ -86,22 +83,23 @@ export default function HomePage() {
       </div>
 
       {isLoaded && user ? (
-        <div className="mb-4 p-4 bg-black-100 rounded-md">
-          <h2 className="text-xl font-semibold mb-2">User Metadata</h2>
-          <p>
-            <strong>Username:</strong> {user.publicMetadata?.username?.toString() ?? 'N/A'}
+        <div className="bg-gray-900 p-5 rounded-xl border border-gray-700 mb-8 shadow-md">
+          <h2 className="text-2xl font-semibold mb-2">👤 User Info</h2>
+          <p className="text-sm text-gray-300">
+            <span className="font-semibold">Username:</span>{' '}
+            {user.publicMetadata?.username?.toString() ?? 'N/A'}
           </p>
-          <p>
-            <strong>User Tier:</strong>{' '}
+          <p className="text-sm text-gray-300">
+            <span className="font-semibold">Tier:</span>{' '}
             {user.publicMetadata?.tier?.toString() ?? 'free'}
           </p>
         </div>
       ) : (
-        <p className="text-gray-500">Loading user data...</p>
+        <p className="text-gray-400">Loading user data...</p>
       )}
 
       {loading ? (
-        <p className="text-gray-500 mt-6">Loading events...</p>
+        <p className="text-gray-400 mt-6">Loading events...</p>
       ) : (
         <EventList events={filteredEvents} />
       )}
