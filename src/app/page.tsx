@@ -1,26 +1,74 @@
 'use client';
 
-import { useUser, SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
-import { useState } from 'react';
-import EventFilter from './components/EventFilter';
+import {
+  useUser,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  UserButton,
+} from '@clerk/nextjs';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase';
 import EventList from './components/EventList';
 
-const allEvents = [
-  { id: 1, title: 'Welcome Webinar', description: 'Kick-off for everyone', tier: 'Free' },
-  { id: 2, title: 'Silver Strategy Talk', description: 'Insights for Silver users', tier: 'Silver' },
-  { id: 3, title: 'Gold Growth Hacks', description: 'Advanced growth tactics', tier: 'Gold' },
-  { id: 4, title: 'Platinum Private Session', description: '1:1 coaching', tier: 'Platinum' },
-  { id: 5, title: 'Silver Social Night', description: 'Networking event', tier: 'Silver' },
-];
+type Tier = 'free' | 'silver' | 'gold' | 'platinum';
+
+type Event = {
+  id: number;
+  title: string;
+  description: string;
+  event_date: string;
+  image_url: string;
+  tier: Tier;
+};
 
 export default function HomePage() {
-  const [selectedTier, setSelectedTier] = useState<'Free' | 'Silver' | 'Gold' | 'Platinum'>('Free');
-  const { user, isLoaded } = useUser(); // 👈 Clerk user hook
+  const { user, isLoaded } = useUser();
+  const [selectedTier, setSelectedTier] = useState<Tier>('free');
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredEvents = allEvents.filter((event) =>
-    ['Free', 'Silver', 'Gold', 'Platinum'].indexOf(event.tier) <=
-    ['Free', 'Silver', 'Gold', 'Platinum'].indexOf(selectedTier)
-  );
+  // Set user tier from metadata
+  useEffect(() => {
+    if (isLoaded && user?.publicMetadata?.tier) {
+      const tier = (user.publicMetadata.tier as string).toLowerCase();
+      if (['free', 'silver', 'gold', 'platinum'].includes(tier)) {
+        setSelectedTier(tier.charAt(0).toUpperCase() + tier.slice(1) as Tier);
+      }
+    }
+  }, [isLoaded, user]);
+
+  // Fetch events from Supabase
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching events:', error.message);
+      } else {
+        setEvents(data as Event[]);
+      }
+      setLoading(false);
+    };
+
+    fetchEvents();
+  }, []);
+
+  const tierOrder = ['free', 'silver', 'gold', 'platinum'];
+
+  const filteredEvents = events.filter((event) => {
+    return (
+      tierOrder.indexOf(event.tier.toLowerCase()) <=
+      tierOrder.indexOf(selectedTier.toLowerCase())
+    );
+  });
+
+  console.log("filer", filteredEvents)
 
   return (
     <main className="p-6 max-w-5xl mx-auto">
@@ -32,22 +80,31 @@ export default function HomePage() {
           </SignedOut>
           <SignedIn>
             <UserButton />
-            <SignOutButton />
+            <SignOutButton redirectUrl="/sign-in" />
           </SignedIn>
         </div>
       </div>
 
-      {/* Show user metadata if signed in and loaded */}
-      {isLoaded && user? (
+      {isLoaded && user ? (
         <div className="mb-4 p-4 bg-black-100 rounded-md">
           <h2 className="text-xl font-semibold mb-2">User Metadata</h2>
-          <p><strong>Username:</strong> {JSON.parse(JSON.stringify(user.publicMetadata)).username || 'N/A'}</p>
-          <p><strong>User Tier:</strong> {JSON.parse(JSON.stringify(user.publicMetadata)).tier || 'N/A'}</p>
+          <p>
+            <strong>Username:</strong> {user.publicMetadata?.username?.toString() ?? 'N/A'}
+          </p>
+          <p>
+            <strong>User Tier:</strong>{' '}
+            {user.publicMetadata?.tier?.toString() ?? 'free'}
+          </p>
         </div>
-      ):"Loading"}
+      ) : (
+        <p className="text-gray-500">Loading user data...</p>
+      )}
 
-      <EventFilter selectedTier={selectedTier} onSelect={setSelectedTier} />
-      <EventList events={filteredEvents} />
+      {loading ? (
+        <p className="text-gray-500 mt-6">Loading events...</p>
+      ) : (
+        <EventList events={filteredEvents} />
+      )}
     </main>
   );
 }
