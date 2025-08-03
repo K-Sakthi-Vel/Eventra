@@ -11,7 +11,8 @@ import {
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import EventList from './components/EventList';
-
+import Image from 'next/image';
+import Logo from '../assets/Icon.webp';
 type Tier = 'free' | 'silver' | 'gold' | 'platinum';
 
 type Event = {
@@ -66,23 +67,27 @@ export default function HomePage() {
   );
 
   return (
-    <main className="min-h-screen bg-black text-white px-4 py-6 md:px-10">
-      <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
-          Tier-Based Event Showcase
-        </h1>
+    <main className="min-h-screen bg-black text-white md:px-10">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6 sticky top-0 z-50 bg-inherit shadow">
+        <div className="flex items-center h-[100px] gap-2 ">
+          <Image src={Logo} alt='logo' className='h-[50px] w-[50px]' />
+          <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
+            Eventra
+          </h1>
+        </div>
+
         <div className="flex items-center gap-3 mt-4 md:mt-0">
           <SignedOut>
             <SignInButton mode="modal" />
           </SignedOut>
           <SignedIn>
             <UserButton />
-            <SignOutButton redirectUrl="/sign-in" />
+            {/* <SignOutButton redirectUrl="/sign-in" /> */}
           </SignedIn>
         </div>
       </div>
 
-      {isLoaded && user ? (
+      {/* {isLoaded && user ? (
         <div className="bg-gray-900 p-5 rounded-xl border border-gray-700 mb-8 shadow-md">
           <h2 className="text-2xl font-semibold mb-2">👤 User Info</h2>
           <p className="text-sm text-gray-300">
@@ -96,7 +101,7 @@ export default function HomePage() {
         </div>
       ) : (
         <p className="text-gray-400">Loading user data...</p>
-      )}
+      )} */}
 
       {loading ? (
         <p className="text-gray-400 mt-6">Loading events...</p>
