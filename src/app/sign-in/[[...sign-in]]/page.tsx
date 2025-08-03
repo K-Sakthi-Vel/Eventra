@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import '../../globals.css';
 import { ClerkProvider, SignIn, SignUpButton } from '@clerk/nextjs';
 
@@ -12,16 +13,16 @@ export default function SignInPage() {
               Welcome Back
             </h1>
             <div>
-            <SignIn/>
+              <SignIn />
 
             </div>
             <div className="text-center mt-4">
               <span className="text-gray-600">Don’t have an account?</span>{' '}
-              <SignUpButton>
+              <Link href="/sign-up">
                 <span className="text-blue-600 hover:underline cursor-pointer">
                   Sign up
                 </span>
-              </SignUpButton>
+              </Link>
             </div>
           </div>
         </main>
