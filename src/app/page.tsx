@@ -82,7 +82,7 @@ export default function HomePage() {
           </SignedOut>
           <SignedIn>
             <UserButton />
-            <SignOutButton redirectUrl="/sign-in" />
+            {/* <SignOutButton redirectUrl="/sign-in" /> */}
           </SignedIn>
         </div>
       </div>
