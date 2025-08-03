@@ -5,7 +5,6 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
-  SignOutButton,
   UserButton,
 } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
@@ -14,6 +13,13 @@ import EventList from './components/EventList';
 import Image from 'next/image';
 import Logo from '../assets/Icon.webp';
 type Tier = 'free' | 'silver' | 'gold' | 'platinum';
+
+const tierColors: Record<Event['tier'], string> = {
+  free: 'bg-gray-700 text-gray-200',
+  silver: 'bg-gray-300 text-gray-800',
+  gold: 'bg-yellow-500 text-white',
+  platinum: 'bg-purple-600 text-white',
+};
 
 type Event = {
   id: number;
@@ -65,10 +71,17 @@ export default function HomePage() {
       tierOrder.indexOf(event.tier.toLowerCase()) <=
       tierOrder.indexOf(selectedTier.toLowerCase())
   );
+   const tier = user?.publicMetadata?.tier?.toString()?.toLowerCase();
+
+const badgeColor =
+  tier && ['free', 'silver', 'gold', 'platinum'].includes(tier)
+    ? tierColors[tier as Tier]
+    : 'bg-blue-800 text-blue-100';
+
 
   return (
     <main className="min-h-screen bg-black text-white md:px-10">
-      <div className="flex flex-col md:flex-row items-center justify-between mb-6 sticky top-0 z-50 bg-inherit shadow">
+      <div className="flex px-5 md:px-0 items-center justify-between mb-6 sticky top-0 z-50 bg-inherit shadow">
         <div className="flex items-center h-[100px] gap-2 ">
           <Image src={Logo} alt='logo' className='h-[50px] w-[50px]' />
           <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
@@ -76,35 +89,31 @@ export default function HomePage() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-3 mt-4 md:mt-0">
+        <div className="flex items-center gap-3 md:mt-0">
+
+          <div className={`px-3 py-1 mr-2 mt-0.5 ${badgeColor} rounded-full`}>
+            {(user?.publicMetadata?.tier?.toString() ?? 'free')
+              .charAt(0)
+              .toUpperCase() + (user?.publicMetadata?.tier?.toString() ?? 'free').slice(1)}
+          </div>
           <SignedOut>
             <SignInButton mode="modal" />
           </SignedOut>
           <SignedIn>
-            <UserButton />
-            {/* <SignOutButton redirectUrl="/sign-in" /> */}
+            <UserButton
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: 'custom-user-avatar',
+                },
+              }}
+            />
           </SignedIn>
         </div>
       </div>
-
-      {/* {isLoaded && user ? (
-        <div className="bg-gray-900 p-5 rounded-xl border border-gray-700 mb-8 shadow-md">
-          <h2 className="text-2xl font-semibold mb-2">👤 User Info</h2>
-          <p className="text-sm text-gray-300">
-            <span className="font-semibold">Username:</span>{' '}
-            {user.publicMetadata?.username?.toString() ?? 'N/A'}
-          </p>
-          <p className="text-sm text-gray-300">
-            <span className="font-semibold">Tier:</span>{' '}
-            {user.publicMetadata?.tier?.toString() ?? 'free'}
-          </p>
-        </div>
-      ) : (
-        <p className="text-gray-400">Loading user data...</p>
-      )} */}
-
       {loading ? (
-        <p className="text-gray-400 mt-6">Loading events...</p>
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+        </div>
       ) : (
         <EventList events={filteredEvents} />
       )}

@@ -1,4 +1,3 @@
-// components/SignOutSection.tsx
 'use client';
 
 import { SignOutButton, UserButton } from '@clerk/nextjs';
