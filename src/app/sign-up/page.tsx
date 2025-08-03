@@ -12,7 +12,6 @@ export default function SignUpPage() {
           </h1>
           <SignUp
             appearance={{ elements: { formButtonPrimary: 'bg-black' } }}
-            afterSignUpUrl="/set-metadata"
           />
         </div>
       </div>
