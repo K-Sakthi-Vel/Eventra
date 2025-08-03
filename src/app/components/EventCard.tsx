@@ -1,19 +1,30 @@
-// app/components/EventCard.tsx
 type Event = {
   id: number;
   title: string;
   description: string;
+  image_url?: string;
   tier: string;
 };
 
 export default function EventCard({ event }: { event: Event }) {
   return (
-    <div className="border rounded-2xl p-4 shadow hover:shadow-lg transition">
-      <h3 className="text-xl font-bold">{event.title}</h3>
-      <p className="text-sm text-gray-600">{event.description}</p>
-      <span className="inline-block mt-2 px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">
-        {event.tier} Tier
-      </span>
+    <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
+      {/* Optional Image */}
+      {event.image_url && (
+        <img
+          src={event.image_url}
+          alt={event.title}
+          className="h-40 w-full object-cover"
+        />
+      )}
+
+      <div className="p-5 flex flex-col justify-between flex-1">
+        <h3 className="text-xl font-bold mb-1">{event.title}</h3>
+        <p className="text-sm text-gray-400">{event.description}</p>
+        <span className="mt-4 self-start text-xs px-2 py-1 bg-blue-800 text-blue-100 rounded-full uppercase tracking-wide">
+          {event.tier} Tier
+        </span>
+      </div>
     </div>
   );
 }
